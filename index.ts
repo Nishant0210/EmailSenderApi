@@ -2,6 +2,8 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import nodemailer from 'nodemailer';
+import nodemailerHandlebars from 'nodemailer-express-handlebars';
+import expressHandlebars from 'express-handlebars';
 
 const app = express();
 const port = 3000;
@@ -14,9 +16,20 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'nishantulhare0210@gmail.com',
-    pass: 'vrdshmn1234'
+    pass: 'vwlf pdvq zlgc vztd'
   }
 });
+
+transporter.use('compile', nodemailerHandlebars({
+    viewEngine: {
+      extname: '.hbs',
+      layoutsDir: './templates', // Specify the path to your templates folder
+      defaultLayout: 'email-template',
+      partialsDir: './templates', // Optional: Specify the path to partials
+    },
+    viewPath: './templates', // Specify the path to your templates folder
+    extName: '.hbs',
+  }));
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello, World!');
@@ -27,10 +40,14 @@ app.post('/send-email', (req: Request, res: Response) => {
 
   const mailOptions = {
     from: 'nishantulhare0210@gmail.com',
-    to: 'snapholic0210@gmail.com',
+    to: 'nishantulhare0210@gmail.com',
     subject: 'test mail',
     // text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
-    text: 'Name: snapholic subject test-mail'
+    template: 'email-template',
+    context: {
+    name: 'Nishant Ulhare',
+    message: 'This is a sample message.',
+  },
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -46,3 +63,6 @@ app.post('/send-email', (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+
+
